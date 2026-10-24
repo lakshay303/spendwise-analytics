@@ -169,6 +169,10 @@ python tests/test_excel.py
 
 python tests/test\_sample\_data.py
 
+python tests/test_excel_limits.py
+
+python tests/test_sample_data.py
+
 ```
 
 

@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 
 from spendwise.database import init_db
@@ -16,6 +17,13 @@ pages = [
     st.Page("views/budgets.py", title="Budgets", icon="🎯"),
     st.Page("views/import_export.py", title="Import / Export", icon="📁"),
 ]
+
+if os.environ.get("DEMO_MODE") == "1":
+    st.warning(
+        "Public demo with sample data. Everyone who visits sees the same data, and it can be reset at "
+        "any time. Please don't enter personal financial information.",
+        icon="⚠️",
+    )
 
 navigation = st.navigation(pages)
 navigation.run()
