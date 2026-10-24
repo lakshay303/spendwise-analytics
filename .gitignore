@@ -1,0 +1,15 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Your personal database: never upload this
+data/*.db
+data/*.db-journal
+data/test_import.csv
+
+# Secrets
+.env
+.streamlit/secrets.toml
