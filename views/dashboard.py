@@ -14,7 +14,8 @@ from spendwise.services.analytics import (
 )
 from spendwise.services.budgets import previous_month
 from spendwise.services.insights import get_insights
-from spendwise.services.transactions import list_transactions
+from spendwise.services.sample_data import load_sample_data
+from spendwise.services.transactions import ValidationError, list_transactions
 from spendwise.ui import format_money, insight_card, metric_card, page_header
 
 
@@ -37,10 +38,27 @@ def change_note(current, previous, higher_is_good):
 
 
 # ---------- Empty state: no data at all ----------
+if "flash" in st.session_state:
+    st.toast(st.session_state.pop("flash"), icon="✅")
+
 if not list_transactions():
     page_header("Dashboard", "Your money at a glance.")
     st.info("Nothing to show yet. Add your first transaction and your dashboard will come to life.")
     st.page_link("views/transactions.py", label="Add your first transaction", icon="➕")
+    st.write("")
+    with st.container(key="card_sample"):
+        st.markdown("**Just exploring?**")
+        st.caption(
+            "Load about three months of example transactions and budgets to see how the app works. "
+            "This is only offered while the database is empty."
+        )
+        if st.button("Load sample data"):
+            try:
+                count = load_sample_data()
+                st.session_state["flash"] = f"Loaded {count} sample transactions."
+                st.rerun()
+            except ValidationError as error:
+                st.error(str(error))
     st.stop()
 
 # ---------- Header and month picker ----------

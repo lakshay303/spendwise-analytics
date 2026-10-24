@@ -1,10 +1,11 @@
+import os
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
 # Project root = the folder that contains app.py
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = BASE_DIR / "data" / "spendwise.db"
+DB_PATH = Path(os.environ.get("SPENDWISE_DB") or BASE_DIR / "data" / "spendwise.db")
 
 DEFAULT_CATEGORIES = [
     ("Food & Dining", "expense"),
