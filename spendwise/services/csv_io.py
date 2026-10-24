@@ -1,6 +1,7 @@
 import csv
 import io
 import re
+import zipfile
 from collections import Counter
 from datetime import date, datetime
 
@@ -9,6 +10,8 @@ from spendwise.services.transactions import VALID_TYPES, ValidationError, _clean
 
 MAX_BYTES = 5 * 1024 * 1024
 MAX_ROWS = 5000
+MAX_UNZIPPED_BYTES = 50 * 1024 * 1024
+EXCEL_ROW_SLACK = 1000  # allowance for blank rows in a sheet
 COLUMNS = ["date", "type", "category", "amount", "description"]
 REQUIRED = ["date", "type", "category", "amount"]
 DATE_FORMATS = ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y")
@@ -208,21 +211,42 @@ def parse_csv(data):
     return _classify(records())
 
 
+def _check_unpacked_size(data):
+    """Refuse .xlsx files that are small to upload but huge once unpacked."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            unpacked = sum(item.file_size for item in archive.infolist())
+    except zipfile.BadZipFile:
+        raise ValidationError(
+            "Could not read the Excel file. Save it as .xlsx with the column names in the first row."
+        )
+    if unpacked > MAX_UNZIPPED_BYTES:
+        raise ValidationError("The Excel file is too large once unpacked. Remove unused data and try again.")
+
+
 def parse_xlsx(data):
     """Read the first sheet of an .xlsx file and sort the rows into new, duplicates and errors."""
     if len(data) > MAX_BYTES:
         raise ValidationError("The file is too large. The limit is 5 MB.")
     if not data:
         raise ValidationError("The file is empty.")
+    _check_unpacked_size(data)
 
     import pandas as pd
 
     try:
-        frame = pd.read_excel(io.BytesIO(data), sheet_name=0, dtype=object)
+        frame = pd.read_excel(
+            io.BytesIO(data),
+            sheet_name=0,
+            dtype=object,
+            nrows=MAX_ROWS + EXCEL_ROW_SLACK + 1,
+        )
     except Exception:
         raise ValidationError(
             "Could not read the Excel file. Save it as .xlsx with the column names in the first row."
         )
+    if len(frame) > MAX_ROWS + EXCEL_ROW_SLACK:
+        raise ValidationError(f"Too many rows. The limit is {MAX_ROWS} per file.")
 
     column_map = {}
     for name in frame.columns:
@@ -235,7 +259,6 @@ def parse_xlsx(data):
             yield position, {name: _cell(values[column_map[name]]) for name in COLUMNS if name in column_map}
 
     return _classify(records())
-
 
 def parse_file(data, filename):
     """Read an uploaded .csv or .xlsx file. Returns the same result as parse_csv()."""
