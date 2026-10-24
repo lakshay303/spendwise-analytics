@@ -10,7 +10,7 @@ Built with Python, Streamlit, Pandas, SQLite and Plotly.
 
 
 
-\*\*Live demo:\*\* \_coming soon\_
+\*\*Live demo:\*\* https://spendwise-analytics-lakshay.streamlit.app/
 
 
 
@@ -225,6 +225,8 @@ tests/                  Automated checks
 
 
 
+\- The live demo is public and uses sample data. Everyone sees the same database, and it can reset at any time, so please don't enter personal information. For your own finances, run SpendWise locally.
+
 \- SpendWise is a single-user app with no login. If it is hosted publicly, every visitor shares the same database, and free hosting platforms may reset local files when an app restarts. Use it locally for your own finances, or treat a hosted copy as a demo.
 
 \- Currency is shown in rupees (₹).
@@ -241,3 +243,8 @@ tests/                  Automated checks
 
 \- Configurable currency
 
+
+
+## License
+
+MIT. See the LICENSE file.
