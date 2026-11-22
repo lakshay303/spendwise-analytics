@@ -4,7 +4,12 @@ A personal finance and expense analytics dashboard. Track income and expenses, s
 
 Built with Python, Streamlit, Pandas, SQLite and Plotly.
 
-**Live demo:** https://spendwise-analytics-lakshay.streamlit.app/
+**Live demos** (same app, sample data):
+
+- Streamlit Community Cloud: https://spendwise-analytics-lakshay.streamlit.app/
+- Microsoft Azure App Service (Linux, Free F1): https://spendwise-analytics-lakshay-aqf7c2enhnbvbthj.centralindia-01.azurewebsites.net
+
+The Azure demo is deployed automatically from this repository with GitHub Actions. It may take a minute to wake up after being idle.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
